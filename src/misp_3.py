@@ -31,7 +31,7 @@ spgse = [
               "t_dur": 3 },
     
     "readout":{"t_o":70,
-               "t_dur":300},
+               "t_dur":20},
     
     "meta":{
         "tr":{}, # object to specify multiparametric transforms which modify multiple data
@@ -43,7 +43,7 @@ spgse = [
                            # label, permitting us to know we may call a particular function on
                            # this grouped event
         
-        "t_ev":80}} # duration of the event
+        "t_ev":90}} # duration of the event
     ]
 
 
@@ -100,7 +100,7 @@ dde = [
     },
 
   {
-   "ro":{},
+   "readout":{"t_o":0, "t_dur":20},
    "meta":{
        "ev_type":"readout",
        "t_ev": 20 }

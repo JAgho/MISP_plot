@@ -25,8 +25,8 @@ def plot_sequence(json, fname):
     mint, maxt = get_sequence_minmax(json)
     lims = find_max_grad(json)
     ax0.set_ylim(ymin= lims[0]*1.3, ymax= lims[1]*1.3)
-    ax0.set_xlim(left=mint, right=maxt)
-    ax1.set_xlim(left=mint, right=maxt)
+    ax0.set_xlim(left=mint, right=maxt+10)
+    ax1.set_xlim(left=mint, right=maxt+10)
     arrow = {'arrowstyle':'<->', 'relpos':(0,0)}
     line = {'arrowstyle':'-', 'relpos':(0,0)}
     for ev in json:
@@ -39,6 +39,8 @@ def plot_sequence(json, fname):
                 plot_trap(ev[key], ax0, offset)
             elif key=="rf_ex" or key=="rf_ref":
                 plot_RF(ev[key], 1, ax1, offset)
+            elif key=="readout":
+                plot_ro(ev[key], lims[1]*0.25,  ax0, offset)
             
         offset += ev["meta"]["t_ev"]
     map(format_axes, [ax0, ax1])
@@ -55,6 +57,17 @@ def plot_sequence(json, fname):
     ax0.legend(loc='best')
     fig.subplots_adjust(hspace=0)
     fig.savefig(fname)
+    
+def plot_ro(readout, height, axis, offset):
+    xpts = np.array([0, 0, readout["t_dur"], readout["t_dur"]])+offset+readout["t_o"]
+    ypts = np.array([0,height, height, 0])
+    midx = (xpts[1]+xpts[2])/2
+    midy = (ypts[0]+ypts[1])/2
+    axis.plot(xpts, ypts, color='black')
+    axis.annotate(str("Readout") , xy=(midx, ypts[1]), xytext=(midx-(readout["t_dur"]/2), ypts[1]*1.3))
+
+    
+    
 
 def plot_trap(grad, axis, offset):
 
