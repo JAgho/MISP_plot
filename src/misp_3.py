@@ -160,6 +160,103 @@ fwfbin = {
     "zgrad2": [0, 0.83919, 0.8182, 0.79311, 0.76183, 0.72021, 0.65841, 0.54419, 0.24048, -0.07555, -0.25331, -0.3765, -0.47118, -0.54739, -0.60963, -0.65982, -0.6983, -0.72412, -0.73473, -0.72505, -0.68396, 0.30116, 0.37236, 0.36936, 0.36404, 0.35925, 0.35544, 0.35265, 0.35084, 0.34995, 0],
     }
 
+fexi = [
+  { # we must uniquely name each subevent in a list to schematically seperate their roles in defining sequence behaviour
+   
+    "gr_pair":{ # paired gradient object (permits shifting big delta)
+        "pol": 1,
+        "t_bdel": 35,
+        "t_r": [2,0,0],
+        "t_f": [2,0,0],
+        "t_p": [20,0,0],
+        "ampl": [40,0,0]},
+    
+    "rf_ex":{ # RF excitation pulse (stable in time)
+             "t_o": -8,
+             "FA": 90,
+             "t_dur": 3 },
+    
+    "rf_ref":{ # Refocusing pulse (likely to move with big delta)
+              "t_o": 25,
+              "FA": 180,
+              "t_dur": 3 },
+    
+    "spoiler1":{ # paired gradient object (permits shifting big delta)
+        "t_o": 70,
+        "t_r": [1,0,0],
+        "t_f": [1,0,0],
+        "t_p": [8,0,0],
+        "ampl": [10,0,0]},
+    "spoiler2":{ # paired gradient object (permits shifting big delta)
+        "t_o": 110,
+        "t_r": [1,0,0],
+        "t_f": [1,0,0],
+        "t_p": [18,0,0],
+        "ampl": [7,0,0]},
+
+    
+    "rf_reex":{ # RF excitation pulse (stable in time)
+             "t_o": 85,
+             "FA": 90,
+             "t_dur": 3 },
+    
+    "meta":{
+        "tr":{}, # object to specify multiparametric transforms which modify multiple data
+                 # for example we could specify big delta as a transform here to move both
+                 # the gradient pulse and the RF pulse by a programmaticaly determined amount
+                 # alternatively we can change just spgse[1][1]["t_bdel"] = ...
+        
+        "ev_type":"sPGSE", # type of event - helps to label grouped subevents under a single
+                           # label, permitting us to know we may call a particular function on
+                           # this grouped event
+        
+        "t_ev":231}}, # duration of the event
+  
+  { # we must uniquely name each subevent in a list to schematically seperate their roles in defining sequence behaviour
+   
+    "gr_pair":{ # paired gradient object (permits shifting big delta)
+        "pol": 1,
+        "t_bdel": 35,
+        "t_r": [2,0,0],
+        "t_f": [2,0,0],
+        "t_p": [20,0,0],
+        "ampl": [40,0,0]},
+    
+    "rf_ex":{ # RF excitation pulse (stable in time)
+             "t_o": -28,
+             "FA": 90,
+             "t_dur": 3 },
+    
+    "rf_ref":{ # Refocusing pulse (likely to move with big delta)
+              "t_o": 25,
+              "FA": 180,
+              "t_dur": 3 },
+    
+    "spoiler1":{ # paired gradient object (permits shifting big delta)
+        "t_o": -20,
+        "t_r": [1,0,0],
+        "t_f": [1,0,0],
+        "t_p": [8,0,0],
+        "ampl": [10,0,0]},
+    
+    "readout":{"t_o":70,
+               "t_dur":20},
+    
+    "meta":{
+        "tr":{}, # object to specify multiparametric transforms which modify multiple data
+                 # for example we could specify big delta as a transform here to move both
+                 # the gradient pulse and the RF pulse by a programmaticaly determined amount
+                 # alternatively we can change just spgse[1][1]["t_bdel"] = ...
+        
+        "ev_type":"sPGSE", # type of event - helps to label grouped subevents under a single
+                           # label, permitting us to know we may call a particular function on
+                           # this grouped event
+        
+        "t_ev":120}}
+  
+
+    ]
+
 #binary = dumps(fwfbin)
 #with open(data_folder / 'fwfbin.cbor', 'wb') as fp:
 #    fp.write(binary)
@@ -173,6 +270,7 @@ misp.plot_sequence(dde, data_folder / "dde.svg")
 
 misp.plot_sequence(spgse, data_folder / "spgse.svg")
 misp.plot_sequence(fwf, data_folder / "fwf.svg")
+misp.plot_sequence(fexi, data_folder / "fexi.svg")
 
 a = time.perf_counter()
 #misp.expand_indr(fwf[0])

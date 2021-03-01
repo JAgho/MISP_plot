@@ -42,7 +42,9 @@ def plot_sequence(json, fname):
                 continue
             elif key=="gr_pair":
                 plot_trap(ev[key], ax0, offset)
-            elif key=="rf_ex" or key=="rf_ref":
+            elif key in ["spoiler1", "spoiler2", "spoiler3"]:
+                plot_spoiler(ev[key], ax0, offset)
+            elif key=="rf_ex" or key=="rf_ref" or key=="rf_reex":
                 plot_RF(ev[key], 1, ax1, offset)
             elif key=="readout":
                 plot_ro(ev[key], lims[1]*0.25,  ax0, offset)
@@ -138,8 +140,16 @@ def fwf_points(grad):
     return points           
                     
             
-
- 
+def plot_spoiler(grad, axis, offset):
+    points = trap_points(grad)
+    try:
+        axis.plot(points[0] + offset + grad["t_o"], points[1]*grad["ampl"][0],  color=(0.2,0.4,1,1), linewidth=2)   
+        axis.plot(points[0] + offset + grad["t_o"], points[1]*grad["ampl"][1],  color='r', linewidth=2)      
+        axis.plot(points[0] + offset + grad["t_o"], points[1]*grad["ampl"][2],  color='g')
+        #print("Succesfully plotted Trap")
+    except:
+        print("Failed to plot Trap")
+    return axis
 
 def plot_trap(grad, axis, offset):
 
