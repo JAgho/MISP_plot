@@ -22,7 +22,7 @@ def plot_sequence(json, fname):
     fig, (ax0, ax1) = plot_nulls()
     fig.set_size_inches(4, 3)
     plt.rcParams.update({'font.size': 8})
-    
+    set_t_m(json)
     mint, maxt = get_sequence_minmax(json)
     lims = find_max_grad(json)
     print("lims are: ", lims)
@@ -30,6 +30,7 @@ def plot_sequence(json, fname):
     ax0.set_ylim(ymin= lims[0]*1.3, ymax= lims[1]*1.3)
     ax0.set_xlim(left=mint, right=maxt+10)
     ax1.set_xlim(left=mint, right=maxt+10)
+    
     #arrow = {'arrowstyle':'<->', 'relpos':(0,0)}
     #line = {'arrowstyle':'-', 'relpos':(0,0)}
     for ev in json:
@@ -100,25 +101,34 @@ def expand_indr(event):
     else:
         return False
                     
-                    
+def set_t_m(json):
+    flag = len(json)==3 and json[0].get("meta").get("ev_type")=="sPGSE" and json[1].get("meta").get("ev_type")=="diff_pair"
+    print(flag)
+    if flag:
+        t_m = json[0].get("meta").get("trf").get("t_m", 0)
+        if t_m:
+            json[0]["meta"]["t_ev"] = json[0]["gr_pair"]["t_bdel"] + t_m
+        
+    #else:
+        #print("DDE is composed of sPGSE and diff_pair objects.")
         
 def plot_fwf(grad, axis, offset):
     #print(grad)
-    if grad.get('pair'):
-        points = fwf_points(grad)
-        #print("points are")
-        #print(points[0]+ offset, points[0]+ grad.get('b_del')+ offset, points[1])
-        #addoff = lambda x: x + grad.get('b_del')
-        #offt = map(addoff, points[0])
-        
-        #print(points)
-        try:
-            #axis.plot(points[0] + offset, points[1],  color=(0.2,0.4,1,1))
-            axis.plot(points[0] + offset, points[1][0,:], color=(0.2,0.4,1,1))
-            axis.plot(points[0] + offset, points[1][1,:], color='r')
-            axis.plot(points[0] + offset, points[1][2,:], color='g')
-        except:
-            print("Failed to plot fwf")
+
+    points = fwf_points(grad)
+    #print("points are")
+    #print(points[0]+ offset, points[0]+ grad.get('b_del')+ offset, points[1])
+    #addoff = lambda x: x + grad.get('b_del')
+    #offt = map(addoff, points[0])
+    
+    #print(points)
+    try:
+        #axis.plot(points[0] + offset, points[1],  color=(0.2,0.4,1,1))
+        axis.plot(points[0] + offset, points[1][0,:], color=(0.2,0.4,1,1))
+        axis.plot(points[0] + offset, points[1][1,:], color='r')
+        axis.plot(points[0] + offset, points[1][2,:], color='g')
+    except:
+        print("Failed to plot fwf")
     return axis
 
 def fwf_points(grad):
@@ -132,9 +142,9 @@ def fwf_points(grad):
         
     for i, r in enumerate(["xgrad2", "ygrad2", "zgrad2"]):
         arr2[i,:] = np.array(grad.get(r))*grad.get("ampl")[i]
-    t1 = np.linspace(0, grad.get("s_del1"), p1)
+    t1 = np.linspace(0, grad.get("t_sdel1"), p1)
     off = grad.get("t_bdel")
-    t2 = np.linspace(0, grad.get("s_del2"), p2) + off
+    t2 = np.linspace(0, grad.get("t_sdel2"), p2) + off
     #print(arr1, arr2)
     points = (np.concatenate((t1, t2), axis=0), np.concatenate((arr1, arr2), axis=1))
     return points           

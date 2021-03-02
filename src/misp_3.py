@@ -74,15 +74,13 @@ dde = [
               "FA": 180,
               "t_dur": 3 },
     "meta":{
-        "tr":{}, 
+        "trf":{"t_m":60}, 
         "ev_type":"sPGSE",
         "t_ev":80}}, # duration of the event
   
   { # Second pulse pair 
    
     "gr_pair":{ 
-        "type": "gr_tr", 
-        "pair": True,
         "pol": 1,
         "t_bdel": 30,
         "t_r": [2,0,0],
@@ -91,12 +89,12 @@ dde = [
         "ampl": [0,20,0]},
     
     
-    "rf_ref":{"type":"rf_sq", 
+    "rf_ref":{ 
               "t_o": 25,
               "FA": 180,
               "t_dur": 3 },
     "meta":{
-        "tr":{}, 
+        "trf":{}, 
         "ev_type":"diff_pair", # identified as a diffusion pulse pair
         "t_ev":70}
     },
@@ -104,6 +102,7 @@ dde = [
   {
    "readout":{"t_o":0, "t_dur":20},
    "meta":{
+       "trf":{},
        "ev_type":"readout",
        "t_ev": 20 }
   }  
@@ -113,11 +112,10 @@ dde = [
 fwf = [
   {    
     "fwf_pair":{ # paired free gradient object 
-        "pair": True,
         "pol": 1,
         "t_bdel": 30,
-        "s_del1": 27.87,
-        "s_del2": 22.6,
+        "t_sdel1": 27.87,
+        "t_sdel2": 22.6,
         "xgrad1": {"indr":"xgrad1"},
         "ygrad1": {"indr":"ygrad1"},
         "zgrad1": {"indr":"zgrad1"},
@@ -126,18 +124,18 @@ fwf = [
         "zgrad2": {"indr":"zgrad2"},
         "ampl": [50,40,30]},
     
-    "rf_ex":{"type":"rf_sq", # RF excitation pulse 
+    "rf_ex":{ # RF excitation pulse 
              "t_o": -8,
              "FA": 90,
              "t_dur": 3 },
     
-    "rf_ref":{"type":"rf_sq", # Refocusing pulse 
+    "rf_ref":{ # Refocusing pulse 
               "t_o": 27.87,
               "FA": 180,
               "t_dur": 3 },
     
     "meta":{
-    "tr":{},
+    "trf":{},
     "ev_type":"fwf_pair",
     "indr":"../output/fwfbin.cbor",
     "t_ev":65}}, 
@@ -145,8 +143,9 @@ fwf = [
   {
    "readout":{"t_o":0, "t_dur":20}, 
    "meta":{
-   "ev_type":"readout",
-   "t_ev": 20 }
+       "trf":{},
+       "ev_type":"readout",
+       "t_ev": 20 }
    
    }  
     ]
@@ -201,7 +200,7 @@ fexi = [
              "t_dur": 3 },
     
     "meta":{
-        "tr":{}, # object to specify multiparametric transforms which modify multiple data
+        "trf":{}, # object to specify multiparametric transforms which modify multiple data
                  # for example we could specify big delta as a transform here to move both
                  # the gradient pulse and the RF pulse by a programmaticaly determined amount
                  # alternatively we can change just spgse[1][1]["t_bdel"] = ...
@@ -243,7 +242,7 @@ fexi = [
                "t_dur":20},
     
     "meta":{
-        "tr":{}, # object to specify multiparametric transforms which modify multiple data
+        "trf":{}, # object to specify multiparametric transforms which modify multiple data
                  # for example we could specify big delta as a transform here to move both
                  # the gradient pulse and the RF pulse by a programmaticaly determined amount
                  # alternatively we can change just spgse[1][1]["t_bdel"] = ...
