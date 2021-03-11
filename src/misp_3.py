@@ -323,6 +323,54 @@ spiral = [
    }  
     ]
 
+spokes = [
+  { # we must uniquely name each subevent in a list to schematically seperate their roles in defining sequence behaviour
+   
+    "gr_pair":{ # paired gradient object (permits shifting big delta)
+        "pol": 1,
+        "t_bdel": 30,
+        "t_r": [2,0,0],
+        "t_f": [2,0,0],
+        "t_p": [20,0,0],
+        "ampl": [50,0,0]},
+    
+    "rf_wav":{
+        "t_o":-12.67,
+        "channels":8,
+        "samples":1268,
+        "rfx":{"indr":"rf_amp"},
+        "rfy":{"indr":"rf_phase"}, 
+        "xgrad1": {"indr":"xgrad"},
+        "ygrad1": {"indr":"ygrad"},
+        "zgrad1": {"indr":"zgrad"},
+        },
+    
+    "rf_ex":{ # RF excitation pulse (stable in time)
+             "t_o": -8,
+             "FA": 90,
+             "t_dur": 3 },
+    
+    "rf_ref":{ # Refocusing pulse (likely to move with big delta)
+              "t_o": 25,
+              "FA": 180,
+              "t_dur": 3 },
+    
+    "readout":{"t_o":70,
+               "t_dur":20},
+    
+    "meta":{
+        "tr":{}, # object to specify multiparametric transforms which modify multiple data
+                 # for example we could specify big delta as a transform here to move both
+                 # the gradient pulse and the RF pulse by a programmaticaly determined amount
+                 # alternatively we can change just spgse[1][1]["t_bdel"] = ...
+        
+        "ev_type":"sPGSE", # type of event - helps to label grouped subevents under a single
+                           # label, permitting us to know we may call a particular function on
+                           # this grouped event
+        
+        "t_ev":90}} # duration of the event
+    ]
+
 #binary = dumps(fwfbin)
 #with open(data_folder / 'fwfbin.cbor', 'wb') as fp:
 #    fp.write(binary)
