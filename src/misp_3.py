@@ -268,6 +268,61 @@ fexi = [
 
     ]
 
+spiral = [
+    {
+    "gr_pair":{ # paired gradient object (permits shifting big delta)
+        "pol": 1,
+        "t_bdel": 30,
+        "t_r": [2,0,0],
+        "t_f": [2,0,0],
+        "t_p": [20,0,0],
+        "ampl": [50,0,0]},
+    
+    "rf_ex":{ # RF excitation pulse (stable in time)
+             "t_o": -8,
+             "FA": 90,
+             "t_dur": 3 },
+    
+    "rf_ref":{ # Refocusing pulse (likely to move with big delta)
+              "t_o": 25,
+              "FA": 180,
+              "t_dur": 3 },
+    
+    
+    "meta":{
+        "tr":{}, # object to specify multiparametric transforms which modify multiple data
+                 # for example we could specify big delta as a transform here to move both
+                 # the gradient pulse and the RF pulse by a programmaticaly determined amount
+                 # alternatively we can change just spgse[1][1]["t_bdel"] = ...
+        
+        "ev_type":"sPGSE", # type of event - helps to label grouped subevents under a single
+                           # label, permitting us to know we may call a particular function on
+                           # this grouped event
+        
+        "t_ev":70}}, # duration of the event
+
+  {
+   "gr_spiral":{
+       "xgrad1": {"indr":"xgrad"},
+       "ygrad1": {"indr":"ygrad"},
+       "zgrad1": {"indr":"zgrad"},
+       "ampl":[60, 59, 0],
+       "raster":0.010, #dur 34.06ms
+       "t_o":0, 
+       "t_dur":20},
+   "readout_spiral": {
+       "FOV":[230,230,230],
+       "res":[1.5, 1.5, 0]
+       },
+   "meta":{
+       "trf":{},
+       "indr":"../output/spiralbin.cbor",
+       "ev_type":"readout",
+       "t_ev": 40 }
+   
+   }  
+    ]
+
 #binary = dumps(fwfbin)
 #with open(data_folder / 'fwfbin.cbor', 'wb') as fp:
 #    fp.write(binary)
@@ -281,7 +336,9 @@ data_folder = Path(r"../output")
 
 #misp.plot_sequence(spgse, data_folder / "spgse.svg")
 #misp.plot_sequence(fwf, data_folder / "fwf.svg")
-misp.plot_sequence(fexi, data_folder / "fexi.svg")
+#misp.plot_sequence(fexi, data_folder / "fexi.svg")
+
+misp.plot_sequence(spiral, data_folder / "spiral.svg")
 
 #a = time.perf_counter()
 #misp.expand_indr(fwf[0])

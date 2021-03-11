@@ -36,6 +36,7 @@ def plot_sequence(json, fname):
     for ev in json:
         
         expand_indr(ev)
+        print(ev)
         keylist = ev.keys()
         
         for key in keylist:
@@ -51,6 +52,8 @@ def plot_sequence(json, fname):
                 plot_ro(ev[key], lims[1]*0.25,  ax0, offset)
             elif key=="fwf_pair":
                 plot_fwf(ev[key], ax0, offset)
+            elif key=="gr_spiral":    
+                plot_spiral(ev[key], ax0, offset)
             
         offset += ev["meta"]["t_ev"]
     map(format_axes, [ax0, ax1])
@@ -103,7 +106,7 @@ def expand_indr(event):
                     
 def set_t_m(json):
     flag = len(json)==3 and json[0].get("meta").get("ev_type")=="sPGSE" and json[1].get("meta").get("ev_type")=="diff_pair"
-    print(flag)
+    #print(flag)
     if flag:
         t_m = json[0].get("meta").get("trf").get("t_m", 0)
         if t_m:
@@ -138,10 +141,14 @@ def fwf_points(grad):
     arr2 = np.zeros((3, p2), dtype=float)
     
     for i, r in enumerate(["xgrad1", "ygrad1", "zgrad1"]):
-        arr1[i,:] = np.array(grad.get(r))*grad.get("ampl")[i]
+        #print(np.array(grad.get(r)).size)
+        if np.array(grad.get(r)).size != 1:
+            arr1[i,:] = np.array(grad.get(r))*grad.get("ampl")[i]
         
     for i, r in enumerate(["xgrad2", "ygrad2", "zgrad2"]):
-        arr2[i,:] = np.array(grad.get(r))*grad.get("ampl")[i]
+        #print(np.array(grad.get(r)).size)
+        if np.array(grad.get(r)).size != 1:    
+            arr2[i,:] = np.array(grad.get(r))*grad.get("ampl")[i]
     t1 = np.linspace(0, grad.get("t_sdel1"), p1)
     off = grad.get("t_bdel")
     t2 = np.linspace(0, grad.get("t_sdel2"), p2) + off
@@ -149,6 +156,28 @@ def fwf_points(grad):
     points = (np.concatenate((t1, t2), axis=0), np.concatenate((arr1, arr2), axis=1))
     return points           
                     
+def spiral_points(grad):
+    p1 = len(grad.get("xgrad1"))
+    arr1 = np.zeros((3, p1), dtype=float)
+    
+    for i, r in enumerate(["xgrad1", "ygrad1", "zgrad1"]):
+        #print(np.array(grad.get(r)).size)
+        if np.array(grad.get(r)).size != 1 and np.array(grad.get(r)).size != 0:
+            arr1[i,:] = np.array(grad.get(r))*grad.get("ampl")[i]
+    step = grad.get("raster")
+    t1 = np.linspace(0, step*p1, p1)#np.linspace(0, grad.get("t_sdel1"), p1)
+    points = (t1, arr1)
+    return points
+
+def plot_spiral(grad, axis, offset):
+    points = spiral_points(grad)
+    print(points)
+    try:
+        axis.plot(points[0] + offset, points[1][0,:], color=(0.2,0.4,1,1), linewidth=0.5)
+        axis.plot(points[0] + offset, points[1][1,:], color='r', linewidth=0.3)
+        axis.plot(points[0] + offset, points[1][2,:], color='g', linewidth=0.3)
+    except:
+        print("Failed to plot fwf")
             
 def plot_spoiler(grad, axis, offset):
     points = trap_points(grad)
@@ -257,6 +286,8 @@ def get_min_max_grad_in_subevent(key, event):
     elif typ=="readout":
         return (0,0)
     elif typ=="fwf_pair":
+        return (max(event["ampl"]), -1*max(event["ampl"]))
+    elif typ=="gr_spiral":
         return (max(event["ampl"]), -1*max(event["ampl"]))
     else:
         return (0,0)
