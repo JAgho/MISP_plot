@@ -11,6 +11,7 @@ from pathlib import Path
 import numpy as np
 from parse import compile, parse
 from itertools import islice
+from time import perf_counter
 
 
 
@@ -29,7 +30,7 @@ def fetch_meta(fp):
     
     return pulses, samples
 
-def build_cbor_from_ini(fname):
+def build_obj_from_ini(fname):
     g = compile("G[{}]=   {}   {}   {}\n")
     rf = compile("RF[{}]=   {}   {}\n")
     with open(fname, 'r') as fp:
@@ -54,9 +55,10 @@ def build_cbor_from_ini(fname):
             obj["rf_phase"][y] = rf[:,2].tolist()
     return obj
     
-
-binobj = build_cbor_from_ini(data_folder / "example_spiral_ptx.ini")
-
+a = perf_counter()
+binobj = build_obj_from_ini(data_folder / "example_spiral_ptx.ini")
+b = perf_counter()
+print(f"time elapsed: {b-a}")
 #spiral = np.loadtxt(data_folder / "spiral_ms5_short.txt", skiprows=1)
 
 #plt.plot(spiral)
@@ -64,6 +66,6 @@ binobj = build_cbor_from_ini(data_folder / "example_spiral_ptx.ini")
 #binobj = {"xgrad":list(spiral[:,0]), "ygrad":list(spiral[:,1]), "zgrad":[]}
 
 binary = dumps(binobj)
-with open(data_folder / 'spiralbin.cbor', 'wb') as fp:
+with open(data_folder / 'spiralrf.cbor', 'wb') as fp:
     fp.write(binary)
     fp.close()

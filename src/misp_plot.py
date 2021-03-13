@@ -89,6 +89,32 @@ def find_indrs(event):
         return obj
     else:
         return False
+    
+def RF_waveform_points(subev):
+    p1 = len(subev.get("xgrad1"))
+    grads = np.zeros((3, p1), dtype=float)
+    rf = [np.zeros((2, p1), dtype=float) for i in range(8)]
+    
+    for i, r in enumerate(["xgrad1", "ygrad1", "zgrad1"]):
+        #print(np.array(grad.get(r)).size)
+        if np.array(subev.get(r)).size != 1 and np.array(subev.get(r)).size != 0:
+            grads[i,:] = np.array(subev.get(r))
+    for j in range(8):        
+        for i, r in enumerate(["rf_amp", "rf_phase"]):
+            #print(np.array(grad.get(r)).size)
+            #if np.array(subev.get(r)).size != 1 and np.array(subev.get(r)).size != 0:
+            rf[j][i,:] = np.array(subev.get(r).get(str(j)))
+    
+    step = subev.get("raster")
+    t1 = np.linspace(0, step*p1, p1)#np.linspace(0, grad.get("t_sdel1"), p1)
+
+
+    return t1, grads, rf
+
+
+def plot_RF_waveform(subev, axis, offset):
+    
+    return
 
 def expand_indr(event):
     obj = find_indrs(event)
@@ -230,10 +256,10 @@ def fixed_width_sinc(l, r, height):
     y = height*np.sinc(np.linspace(2*np.pi, -2*np.pi, 200))
     return x, y
 
+
 def plot_RF(rfevent, height, axis, offset):
-    rf_tup = true_times_RF(rfevent, height, offset)
     
-    #print(rf_tup)
+    rf_tup = true_times_RF(rfevent, height, offset)
     x, y = fixed_width_sinc(rf_tup[0][1],rf_tup[0][2],1)
     axis.plot(x, y, color="black", linewidth=0.5)
     axis.annotate(str(rfevent['FA']) + r"$^{\circ}$" , xy=(rf_tup[0][1], rf_tup[1][1]), xytext=(rf_tup[0][1], rf_tup[1][1]+ (0.05*rf_tup[1][1])))

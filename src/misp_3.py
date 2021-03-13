@@ -8,6 +8,7 @@ import misp_plot as misp
 from pathlib import Path
 from cbor2 import dumps, loads
 import time
+import matplotlib.pyplot as plt
 
 
 
@@ -338,8 +339,9 @@ spokes = [
         "t_o":-12.67,
         "channels":8,
         "samples":1268,
-        "rfx":{"indr":"rf_amp"},
-        "rfy":{"indr":"rf_phase"}, 
+        "raster":0.010,
+        "rf_amp":{"indr":"rf_amp"},
+        "rf_phase":{"indr":"rf_phase"}, 
         "xgrad1": {"indr":"xgrad"},
         "ygrad1": {"indr":"ygrad"},
         "zgrad1": {"indr":"zgrad"},
@@ -363,7 +365,7 @@ spokes = [
                  # for example we could specify big delta as a transform here to move both
                  # the gradient pulse and the RF pulse by a programmaticaly determined amount
                  # alternatively we can change just spgse[1][1]["t_bdel"] = ...
-        
+        "indr":"../output/spiralrf.cbor",
         "ev_type":"sPGSE", # type of event - helps to label grouped subevents under a single
                            # label, permitting us to know we may call a particular function on
                            # this grouped event
@@ -371,22 +373,57 @@ spokes = [
         "t_ev":90}} # duration of the event
     ]
 
+
+
 #binary = dumps(fwfbin)
 #with open(data_folder / 'fwfbin.cbor', 'wb') as fp:
 #    fp.write(binary)
 #    fp.close()
 # for event in fwf:
 #     print(misp.expand_indr(event))
+def plot_8rf():
+    fig, (axes) = plt.subplots(9, 1, gridspec_kw={'height_ratios': [4, 1,1,1,1,1,1,1,1]})
+    axes[0].plot(0,0, label=r"$x$", color=(0.2,0.4,1,1))
+    axes[0].plot(0,0, label=r"$y$", color='r')
+    axes[0].plot(0,0, label=r"$z$", color='g')
+    plt.rcParams.update({'font.size': 8})
+    axes[8].set_xlabel("Time (ms)")
+    axes[0].set_ylabel("Gradient " + r"($m T / m$)")
+    for i in range(8):
+        axes[i+1].set_ylabel("RF"+str(i+1))
+    for tick in axes[0].xaxis.get_major_ticks():
+        tick.label1.set_visible(False)
+    fig.subplots_adjust(hspace=0)
+    
+    return fig, (axes)
 
-data_folder = Path(r"../output")  
+fig, (axes) = plot_8rf()
 
+data_folder = Path(r"../output")
+
+for ev in spokes:
+    misp.expand_indr(ev)
+
+#for rf in spokes[0]["rf_wav"]["rfx"].values():
+ #   print(rf)
+t1, grads, rf = misp.RF_waveform_points(spokes[0]["rf_wav"])    
+axes[0].plot(t1, grads[0],  color=(0.2,0.4,1,1)) 
+axes[0].plot(t1, grads[1], color='r') 
+axes[0].plot(t1, grads[2], color='g')
+axes[0].yaxis.set_ticklabels([])
+axes[0].get_yaxis().set_ticks([])
+for i in range(8):
+    axes[i+1].plot(t1, rf[i][0]*20, linewidth = 0.5, color='b'); axes[i+1].plot(t1, rf[i][1], linewidth = 0.5, color='g')
+    axes[i+1].yaxis.set_ticklabels([])
+    axes[i+1].get_yaxis().set_ticks([])
+fig.savefig(data_folder / "rf_spiral.svg")
 #misp.plot_sequence(dde, data_folder / "dde.svg")
 
 #misp.plot_sequence(spgse, data_folder / "spgse.svg")
 #misp.plot_sequence(fwf, data_folder / "fwf.svg")
 #misp.plot_sequence(fexi, data_folder / "fexi.svg")
 
-misp.plot_sequence(spiral, data_folder / "spiral.svg")
+#misp.plot_sequence(spiral, data_folder / "spiral.svg")
 
 #a = time.perf_counter()
 #misp.expand_indr(fwf[0])
